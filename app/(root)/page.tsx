@@ -9,16 +9,27 @@ import { Thumbnail } from "@/components/Thumbnail";
 import { Separator } from "@/components/ui/separator";
 import { getFiles, getTotalSpaceUsed } from "@/lib/actions/file.actions";
 import { convertFileSize, getUsageSummary } from "@/lib/utils";
+import { cookies } from "next/headers";
+
+// Fonction asynchrone pour récupérer les cookies
+const getDarkMode = async () => {
+  const cookieStore = await cookies(); // Utilisez await pour attendre les cookies
+  const theme = cookieStore.get("theme"); // Récupération du cookie 'theme'
+  return theme === "dark";
+};
 
 const Dashboard = async () => {
-  // Parallel requests
+  // Récupérer les données côté serveur (fichiers et espace total)
   const [files, totalSpace] = await Promise.all([
     getFiles({ types: [], limit: 10 }),
     getTotalSpaceUsed(),
   ]);
 
-  // Get usage summary
-  const usageSummary = getUsageSummary(totalSpace);
+  // Détecter le mode sombre de manière asynchrone
+  const isDarkMode = await getDarkMode();
+
+  // Obtenir le résumé d'usage avec l'information sur le mode
+  const usageSummary = getUsageSummary(totalSpace, isDarkMode);
 
   return (
     <div className="dashboard-container">
@@ -35,13 +46,6 @@ const Dashboard = async () => {
             >
               <div className="space-y-4">
                 <div className="flex justify-between gap-3">
-                  <Image
-                    src={summary.icon}
-                    width={100}
-                    height={100}
-                    alt="uploaded image"
-                    className="summary-type-icon"
-                  />
                   <h4 className="summary-type-size">
                     {convertFileSize(summary.size) || 0}
                   </h4>

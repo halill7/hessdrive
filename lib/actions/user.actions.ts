@@ -3,10 +3,28 @@
 import { createAdminClient, createSessionClient } from "@/lib/appwrite";
 import { appwriteConfig } from "@/lib/appwrite/config";
 import { Query, ID } from "node-appwrite";
-import { parseStringify } from "@/lib/utils";
+import { getUsageSummary, parseStringify } from "@/lib/utils";
 import { cookies } from "next/headers";
 import { avatarPlaceholderUrl } from "@/constants";
 import { redirect } from "next/navigation";
+import { GetServerSideProps } from "next";
+
+export const getServerSideProps: GetServerSideProps = async (context) => {
+  // Exemple de récupération de la préférence depuis un cookie ou un en-tête
+  const isDarkMode = context.req.cookies.theme === "dark"; // Exemple avec un cookie
+
+  // Récupération réelle des données d'espace, cela peut être via une API ou un service
+  // Voici un exemple générique où vous pouvez récupérer ces données
+  const totalSpace = await fetchSomeData(); // Remplacez cette fonction par votre propre appel API ou logique de récupération des données
+
+  const usageSummary = getUsageSummary(totalSpace, isDarkMode);
+
+  return {
+    props: {
+      usageSummary, // Passer les données avec les icônes appropriées
+    },
+  };
+};
 
 const getUserByEmail = async (email: string) => {
   const { databases } = await createAdminClient();

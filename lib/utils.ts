@@ -182,21 +182,93 @@ export const constructDownloadUrl = (bucketFileId: string) => {
   return `${process.env.NEXT_PUBLIC_APPWRITE_ENDPOINT}/storage/buckets/${process.env.NEXT_PUBLIC_APPWRITE_BUCKET}/files/${bucketFileId}/download?project=${process.env.NEXT_PUBLIC_APPWRITE_PROJECT}`;
 };
 
+// DARK OR LIGHT MODE
+function useDarkMode() {
+  const [isDarkMode, setIsDarkMode] = useState(false);
+
+  useEffect(() => {
+    // Vérifie si le mode sombre est activé dans les préférences du navigateur
+    const matchMedia = window.matchMedia("(prefers-color-scheme: dark)");
+    setIsDarkMode(matchMedia.matches);
+
+    // Ajoute un écouteur pour les changements de thème
+    const handleChange = (e: MediaQueryListEvent) => setIsDarkMode(e.matches);
+    matchMedia.addEventListener("change", handleChange);
+
+    // Nettoyage de l'écouteur lors du démontage du composant
+    return () => matchMedia.removeEventListener("change", handleChange);
+  }, []);
+
+  return isDarkMode;
+}
+
 // DASHBOARD UTILS
-export const getUsageSummary = (totalSpace: any) => {
+// utils/usageSummary.ts
+
+/* export const getUsageSummary = (totalSpace: any, isDarkMode: boolean) => {
   return [
     {
       title: "Documents",
       size: totalSpace.document.size,
       latestDate: totalSpace.document.latestDate,
-      icon: "/assets/icons/file-document-light.svg",
+      icon: isDarkMode
+          ? "/assets/icons/file-document-dark.svg"
+          : "/assets/icons/file-document-light.svg",
       url: "/documents",
     },
     {
       title: "Images",
       size: totalSpace.image.size,
       latestDate: totalSpace.image.latestDate,
-      icon: "/assets/icons/file-image-light.svg",
+      icon: isDarkMode
+          ? "/assets/icons/file-image-dark.svg"
+          : "/assets/icons/file-image-light.svg",
+      url: "/images",
+    },
+    {
+      title: "Media",
+      size: totalSpace.video.size + totalSpace.audio.size,
+      latestDate:
+          totalSpace.video.latestDate > totalSpace.audio.latestDate
+              ? totalSpace.video.latestDate
+              : totalSpace.audio.latestDate,
+      icon: isDarkMode
+          ? "/assets/icons/file-video-dark.svg"
+          : "/assets/icons/file-video-light.svg",
+      url: "/media",
+    },
+    {
+      title: "Others",
+      size: totalSpace.other.size,
+      latestDate: totalSpace.other.latestDate,
+      icon: isDarkMode
+          ? "/assets/icons/file-other-dark.svg"
+          : "/assets/icons/file-other-light.svg",
+      url: "/others",
+    },
+  ];
+}; */
+
+// utils/usageSummary.ts
+
+export const getUsageSummary = (totalSpace: any, isDarkMode: boolean) => {
+  return [
+    {
+      title: "Documents",
+      size: totalSpace.document.size,
+      latestDate: totalSpace.document.latestDate,
+      /* icon: isDarkMode
+        ? "/assets/icons/file-document-dark.svg"
+        : "/assets/icons/file-document-light.svg", */
+      url: "/documents",
+    },
+    {
+      title: "Images",
+      size: totalSpace.image.size,
+      latestDate: totalSpace.image.latestDate,
+      /* icon: isDarkMode
+        ? "/assets/icons/file-image-dark.svg"
+        : "/assets/icons/file-image-light.svg", */
       url: "/images",
     },
     {
@@ -206,14 +278,18 @@ export const getUsageSummary = (totalSpace: any) => {
         totalSpace.video.latestDate > totalSpace.audio.latestDate
           ? totalSpace.video.latestDate
           : totalSpace.audio.latestDate,
-      icon: "/assets/icons/file-video-light.svg",
+      /* icon: isDarkMode
+        ? "/assets/icons/file-video-dark.svg"
+        : "/assets/icons/file-video-light.svg", */
       url: "/media",
     },
     {
       title: "Others",
       size: totalSpace.other.size,
       latestDate: totalSpace.other.latestDate,
-      icon: "/assets/icons/file-other-light.svg",
+      /* icon: isDarkMode
+        ? "/assets/icons/file-other-dark.svg"
+        : "/assets/icons/file-other-light.svg", */
       url: "/others",
     },
   ];
